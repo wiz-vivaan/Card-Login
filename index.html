@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Card Login</title>
+  <link rel="icon" href="https://i.ibb.co/wNNNBkHb/ep-circle.png" type="image/png" sizes="any">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0e0e0e;
+      color: #ffd700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: #1c1c1c;
+      border: 2px solid #ffd700;
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-container img {
+      width: 120px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px #ffd700;
+    }
+
+    .login-container input[type="text"],
+    .login-container input[type="password"] {
+      width: 90%;
+      padding: 12px 15px;
+      margin: 10px auto;
+      display: block;
+      border: 2px solid #ffd700;
+      background-color: #111;
+      color: #ffd700;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    .login-container input::placeholder {
+      color: #aaa;
+    }
+
+    .login-container button {
+      width: 90%;
+      padding: 12px;
+      background-color: #d4af37;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: 0.3s;
+    }
+
+    .login-container button:hover {
+      background-color: #bfa22f;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+      display: none;
+    }
+
+    .modal-content {
+      background-color: #1c1c1c;
+      border: 2px solid #ffd700;
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      color: #ffd700;
+      width: 80%;
+      max-width: 400px;
+    }
+
+    .modal-content button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      margin-inline: 10px;
+      background-color: #d4af37;
+      color: #000;
+      transition: 0.3s;
+    }
+
+    .modal-content button:hover {
+      background-color: #bfa22f;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0uF6WmRT9_gXXuWak40yQkjt1NAZrQA4SV8vJMB3ksxb2tEUB2VWv0TAuYiTEQ8yOkSU&usqp=CAU" alt="Logo" />
+    <input type="text" id="username" placeholder="Name" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <div class="message" id="message"></div>
+  </div>
+
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <p id="confirmText">Are you sure you want to enter?</p>
+      <button onclick="proceedLogin()">Yes</button>
+      <button onclick="cancelLogin()">No</button>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
+    login();
+  }
+});
+
+  let nextBalance = 100;
+
+  function resetBalanceIfNewDay() {
+    const today = new Date().toDateString();
+    const lastLogin = localStorage.getItem("lastLoginDate");
+    if (lastLogin !== today) {
+      const max = localStorage.getItem("maxBalance") || "100";
+      localStorage.setItem("balance", max);
+      localStorage.setItem("lastLoginDate", today);
+    }
+  }
+
+  function login() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const message = document.getElementById('message');
+
+    if (username === "Reyansh Rao" && (password === "918860570235" || password === "Vivaan@29")) {
+      const isAdmin = password === "Vivaan@29";
+      localStorage.setItem("isAdmin", isAdmin);
+      localStorage.setItem("currentUser", "Reyansh Rao");
+      resetBalanceIfNewDay();
+
+      if (!isAdmin) {
+        let balance = parseInt(localStorage.getItem("balance") || "100");
+        let max = parseInt(localStorage.getItem("maxBalance") || "100");
+        nextBalance = Math.max(0, balance - 1);
+        document.getElementById("confirmText").innerText =
+          `Are you sure you want to enter?\nYour balance after this will be ${nextBalance}/${max}`;
+        document.getElementById("confirmModal").style.display = "flex";
+      } else {
+        message.style.color = "limegreen";
+        message.textContent = "Admin access granted!";
+        setTimeout(() => window.location.href = "profile.html", 800);
+      }
+
+    } else if (username === "Vivaan Rao" && password === "Vivaan@29") {
+      localStorage.setItem("isAdmin", true);
+      localStorage.setItem("currentUser", "Vivaan Rao");
+      message.style.color = "limegreen";
+      message.textContent = "Login successful!";
+      setTimeout(() => window.location.href = "vivaan.html", 800);
+    } else {
+      message.style.color = "red";
+      message.textContent = "Invalid credentials.";
+    }
+  }
+
+  function proceedLogin() {
+    localStorage.setItem("balance", nextBalance);
+    document.getElementById("confirmModal").style.display = "none";
+    document.getElementById("message").style.color = "limegreen";
+    document.getElementById("message").textContent = "Login successful!";
+    setTimeout(() => window.location.href = "profile.html", 800);
+  }
+
+  function cancelLogin() {
+    document.getElementById("confirmModal").style.display = "none";
+  }
+</script>
+</body>
+</html>

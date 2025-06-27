@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile</title>
+  <link rel="icon" href="https://i.ibb.co/wNNNBkHb/ep-circle.png" type="image/png">
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: gold;
+      font-family: monospace;
+      min-height: 100vh;
+      padding: 40px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid gold;
+      padding: 30px;
+      max-width: 800px;
+      width: 90%;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logout {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 24px;
+      color: gold;
+      text-decoration: none;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-decoration: underline;
+    }
+
+    .info-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .info-text {
+      max-width: 60%;
+    }
+
+    .info-text p {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+
+    img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border: 2px solid gold;
+      border-radius: 6px;
+      margin-left: 20px;
+      margin-top: -10px;
+    }
+
+    .admin-buttons {
+      margin-top: 20px;
+    }
+
+    .admin-buttons button {
+      background-color: #d4af37;
+      color: #000;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      margin-right: 10px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 15px;
+    }
+
+    .admin-buttons button:hover {
+      background-color: #bfa22f;
+    }
+
+    input[type="text"] {
+      background: black;
+      border: 1px solid gold;
+      color: gold;
+      font-family: monospace;
+      padding: 5px;
+      width: 100%;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <a href="index.html" class="logout">⍈</a>
+    <h1>Profile</h1>
+    <div class="info-block">
+      <div class="info-text" id="infoDisplay"></div>
+      <img src="https://i.ibb.co/23cXmfqv/IMG-20240829-184652-1.png" alt="Reyansh" />
+    </div>
+
+    <div class="admin-buttons" id="adminControls" style="display:none">
+      <button onclick="toggleEdit(this)">Edit Info</button>
+      <button onclick="resetBalance()">Reset Balance</button>
+    </div>
+  </div>
+
+  <script>
+    const infoFields = ["Name", "Gender", "M. Name", "F. Name", "Class", "School", "Address", "DOB"];
+    const defaultInfo = {
+      Name: "Reyansh Rao",
+      Gender: "Boy",
+      "M. Name": "Neeta Yadav",
+      "F. Name": "Arun Kumar",
+      Class: "1st",
+      School: "Yaduvanshi Shiksha Niketan",
+      Address: "Flat No. 1702, Tower 1,\nRising Homes, Sector 92, Gurugram",
+      DOB: "17 Mar 2019"
+    };
+
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const savedInfo = JSON.parse(localStorage.getItem("reyanshInfo")) || defaultInfo;
+
+    const container = document.getElementById("infoDisplay");
+
+    function renderInfo(asInputs = false) {
+      container.innerHTML = "";
+      for (const field of infoFields) {
+        const value = savedInfo[field] || "";
+        if (asInputs) {
+          container.innerHTML += `<p><strong>${field}:</strong><br><input type="text" id="${field}" value="${value.replaceAll("\n", " ")}"></p>`;
+        } else {
+          container.innerHTML += `<p><strong>${field}:</strong> ${value.replaceAll("\n", "<br>")}</p>`;
+        }
+      }
+    }
+
+    function toggleEdit(btn) {
+      if (btn.innerText === "Edit Info") {
+        renderInfo(true);
+        btn.innerText = "Save Info";
+      } else {
+        for (const field of infoFields) {
+          savedInfo[field] = document.getElementById(field).value;
+        }
+        localStorage.setItem("reyanshInfo", JSON.stringify(savedInfo));
+        renderInfo(false);
+        btn.innerText = "Edit Info";
+      }
+    }
+
+    function resetBalance() {
+      if (confirm("Are you sure you want to force reset Reyansh's balance?")) {
+        const max = localStorage.getItem("maxBalance") || "100";
+        localStorage.setItem("balance", max);
+        alert("Reyansh's balance reset to max.");
+      }
+    }
+
+    if (isAdmin) document.getElementById("adminControls").style.display = "block";
+    renderInfo(false);
+
+    // Matrix rain
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    let chars = "01".split("");
+    let fontSize = 14;
+    let columns = canvas.width / fontSize;
+    let drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#d4af37";
+      ctx.font = fontSize + "px monospace";
+      for (let i = 0; i < drops.length; i++) {
+        let text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+  </script>
+</body>
+</html>
