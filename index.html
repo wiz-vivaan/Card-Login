@@ -138,10 +138,10 @@
 
   <script>
   document.addEventListener("keydown", function (e) {
-  if (e.key === "Enter") {
-    login();
-  }
-});
+    if (e.key === "Enter") {
+      login();
+    }
+  });
 
   let nextBalance = 100;
 
@@ -169,6 +169,14 @@
       if (!isAdmin) {
         let balance = parseInt(localStorage.getItem("balance") || "100");
         let max = parseInt(localStorage.getItem("maxBalance") || "100");
+
+        // 🛑 Block login if balance is 0
+        if (balance <= 0) {
+          message.style.color = "red";
+          message.textContent = "Access denied. Your balance is 0. Come back tomorrow.";
+          return;
+        }
+
         nextBalance = Math.max(0, balance - 1);
         document.getElementById("confirmText").innerText =
           `Are you sure you want to enter?\nYour balance after this will be ${nextBalance}/${max}`;
